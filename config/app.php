@@ -67,7 +67,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    //    'timezone' => 'UTC',
+    'timezone' => 'PRC',
 
     /*
     |--------------------------------------------------------------------------
@@ -120,7 +121,6 @@ return [
     */
 
     'key' => env('APP_KEY'),
-
     'cipher' => 'AES-256-CBC',
 
     /*
@@ -135,6 +135,10 @@ return [
     */
 
     'providers' => [
+        //IDE
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        //验证码类
+        Mews\Captcha\CaptchaServiceProvider::class,
 
         /*
          * Laravel Framework Service Providers...
@@ -189,6 +193,8 @@ return [
     */
 
     'aliases' => [
+        //门面注册 然后去发布配置生成配置文件 php artisan vendor:publish
+        'Captcha'=> Mews\Captcha\Facades\Captcha::class,
 
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,

@@ -1,6 +1,4 @@
 <?php
-
-//use Illuminate\Routing\Route;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,41 +10,50 @@
 |
 */
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
-//获取根目录路由
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
-Auth::routes();
 
-//登录
-Route::get('login','login\loginController@login');
-Route::post('dologin','login\loginController@dologin');
-//获取文章路由分组
-Route::group(['prefix'=>'article'],function(){
-    //获取列表页
-    Route::get('list','article\ArticleController@listArticle');
-    //获取列表数据
-    Route::get('getlist','article\ArticleController@getList');
+################################
+#首页------------start
+Route::get('/','index\IndexController@index')->name('home')->middleware(['hotkeywords']);
+Route::get('/hot','index\IndexController@indexHot')->name('home.hot');
+//个人信息
+Route::get('/userdetail','user\UserController@getDetail')->name('u.detail');//个人信息
+//首页-------------end
 
-
-
-
-
-
-    Route::post('add','ArticleController@addArticle');
-    Route::post('update','ArticleController@updateArticle');
-    Route::delete('del','ArticleController@delArticle');
+###################################
+#前台
+//前台登录-----------start
+Route::group(['namespace'=>'login','prefix'=>'login','middleware'=>'hotkeywords'],function (){
+    //登录页面
+    Route::get('','LoginController@index')->name('l.login');
+    //登录处理
+    Route::post('','LoginController@login')->name('l.login');
+    //登出
+    Route::get('/logout','LoginController@logout')->name('l.logout');
 });
+//前台登陆--------------end
+
+//文章组---------------------start
+Route::group(['namespace'=>'article','prefix'=>'article','middleware'=>['ckl','hotkeywords']],function (){
+    //显示文章列表
+    Route::get('/','ArticleController@index')->name('a.list');
+    Route::get('hot','ArticleController@articleHot')->name('a.hot');
+    Route::get('detail/{id}','ArticleController@detail')->name('a.detail')->middleware(['crn']);
+
+    //添加文章
+    Route::post('add','ArticleController@addArticleSave')->name('a.add');
+    Route::get('add','ArticleController@addArticle')->name('a.add');
+
+    //修改文章
+    Route::put('edit','ArticleController@updateArticleSave')->name('a.edit');
+    Route::get('edit','ArticleController@updateArticle')->name('a.edit');
+
+    //删除文章
+    Route::delete('/del/{id}','ArticleController@delArticle')->name('a.del');
+});
+//文章组---------------end
+
+//后台路由
+include('admin.php');
 
 
-//创建auth模块自动添加的以下内容
-//Auth::routes();
-//
-//Route::get('/home', 'HomeController@index')->name('home');
-//
-//Auth::routes();
-//
-//Route::get('/home', 'HomeController@index')->name('home');
+

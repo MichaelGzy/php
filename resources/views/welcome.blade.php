@@ -64,13 +64,6 @@
         </style>
     </head>
     <body>
-    <div>
-        <a href="article/list">进入文章列表</a><br>
-        <ul>
-            <li><a href="/login">登录</a></li>
-            {{--<li><a href="/register">注册</a></li>--}}
-        </ul>
-    </div>
         <div class="flex-center position-ref full-height">
             @if (Route::has('login'))
                 <div class="top-right links">

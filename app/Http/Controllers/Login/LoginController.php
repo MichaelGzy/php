@@ -1,30 +1,86 @@
 <?php
 
-namespace App\Http\Controllers\Login;
+namespace App\Http\Controllers\login;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Login\Login;
+use Illuminate\Support\Facades\Validator;
+use App\models\logic\LoginLogic;
 
 class LoginController extends Controller
 {
-    public function login(){
-        return view('login/login');
-    }
-    public function doLogin(Request $request){
-        //获取提交的数据
-        $username=$request->get('u');
-        $password=$request->get('p');
+    private $logic;
 
-        $rs = Login::getUser();
-        if ($rs['username']==$username && $rs['password']==$password){
-            echo "登录成功";
-            return view('article/article',['data'=>$rs]);
+    public function __construct(LoginLogic $logic)
+    {
+        $this->logic=$logic;
+    }
+
+    public function index(){
+
+        return view('login.login');
+    }
+
+    /**
+     * 验证码
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function loginCheck(Request $request){
+
+        $validator =Validator::make($request->all(),[
+            'username'=>'required|min:3',
+            'password'=>'required|min:4|max:12',
+            'code'=>'required|captcha'
+        ],[
+            'username.required'=>'宝贝,用户名要写',
+            'username.min'=>'用户名至少3个字符',
+            'password.required'=>'密码不填,你就提交,厉害了~',
+            'password.min'=>'密码长度4~12位',
+            'password.max'=>'密码长度4~12位',
+            'code.required'=>'验证码哪去了?',
+            'code.captcha'=>'验证码不正确'
+        ]);
+        if ($validator->fails()){
+            session()->forget('error');
+            session()->flash('error','验证失败,请重新输入');
+            return false;
         }else{
-            echo "登录需要的信息:";
-            echo '登录失败';
-            dump($rs);
-            return view('/login/login');
+            session()->forget('success');
+            session()->flash('success','登录成功');
+            return view('index.index');
         }
+
+    }
+
+    public function login(Request $request){
+        //用户信息
+        $u_data = $request->all();
+        //验证格式
+        $rs =$this->loginCheck($request);
+        if ($rs) {
+            //验证信息
+            $bool=$this->logic->checkLogin($u_data);
+            //dump($bool);die;
+            if ($bool){
+                $html='登录成功';
+                //登录成功
+                return redirect(route('home'))->with(['loginsuccess'=>$html]);
+            }
+        }
+        return redirect()->back();
+        //return redirect(route('a.list')); //这里后面需要跳转到首页
+    }
+
+    public function logout(){
+        if(session()->has('userinfo')){
+            //清空session中userinfo
+            session()->flush('userinfo');
+            //设置提示信息
+            session('lomsg','成功退出,回见');
+            return redirect(route('l.login')); //这里后面需要跳转到首页
+        }
+        return redirect(route('l.login'))->with('lofmsg','您未进行登录,请先登录');
+
     }
 }

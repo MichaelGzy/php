@@ -2,6 +2,8 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckLogin;
+use App\Http\Middleware\CountReadNum;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -51,6 +53,12 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+
+//          注册中间件 检测登录
+        'ckl'=> \App\Http\Middleware\CheckLogin::class,
+        'crn'=> \App\Http\Middleware\CountReadNum::class,
+        'hotkeywords'=> \App\Http\Middleware\HotKeywords::class,
+
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,

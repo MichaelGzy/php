@@ -6,14 +6,14 @@
  * Time: 23:19
  */
 ?>
-        <!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en" >
 
 <head>
     <meta charset="UTF-8">
-    <title>Login Form</title>
+    <title>登录页面</title>
 
-    <link rel="stylesheet" href="/js/normalize.min.css">
+    <link rel="stylesheet" href="/css/normalize.min.css">
 
 
     <style>
@@ -85,22 +85,51 @@
 <body>
 
 <div class="login">
-    <h1>LOGIN</h1>
-    <form method="post" action="dologin">
-        <input type="text" name="u" placeholder="Username" value="" required="required" />
-        <input type="password" name="p" placeholder="Password" value="" required="required" />
+    @if(session()->has('error'))
+        <span style="color: red;">{{session('error')}}</span>
+    @elseif(session()->has('cklmsg'))
+        <span style="color: red;">{{session('cklmsg')}}</span>
+    @elseif(session()->has('lofmsg'))
+        <span style="color: red;">{{session('lofmsg')}}</span>
+    @endif
+    <h1>欢迎登录</h1>
+    <form method="post" action="{{route('l.login')}}">
+        @csrf
+        <div>
+        <input type="text" name="username" placeholder="Username" value="" required="required" />
+        @if($errors->has('username'))
+            <span style="color: red;">{{$errors->first('username')}}</span>
+        @endif
+        </div>
+        <div>
+        <input type="password" name="password" placeholder="Password" value="" required="required" />
+        @if($errors->has('password'))
+            <span style="color: red;">{{$errors->first('password')}}</span>
+        @endif
+        </div>
+        <div>
+        <input type="text" name="code" style="width: 140px;display: inline" placeholder="输入验证码">
+        <img id="code" src="{{captcha_src()}}"  alt="verify">
+        @if($errors->has('code'))
+            <span style="color: red;">{{$errors->first('code')}}</span>
+        @endif
+        </div>
         <button type="submit" class="btn btn-primary btn-block btn-large">登陆</button>
     </form>
 </div>
-
-
-
-<script  src="/js/index.js"></script>
-
-
-
+<script>
+    //点击换验证码
+    document.querySelector('#code').onclick=(evt)=>{
+        let src = evt.target.src;
+        //当前时间
+        let rn = new Date().getTime();
+        src = `${src}?vt=${rn}`;
+        evt.target.src =src;
+    }
+</script>
 
 </body>
 
 </html>
+
 
